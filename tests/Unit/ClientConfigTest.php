@@ -3,7 +3,6 @@
 use PhpMcp\Client\ClientConfig;
 use PhpMcp\Client\Factory\MessageIdGenerator;
 use PhpMcp\Client\Model\Capabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -11,7 +10,8 @@ use Psr\SimpleCache\CacheInterface;
 use React\EventLoop\LoopInterface;
 
 beforeEach(function () {
-    $this->clientInfo = new ClientInfo('TestClient', '1.0');
+    $this->name = 'TestClient';
+    $this->version = '1.0';
     $this->capabilities = Capabilities::forClient();
     $this->loop = Mockery::mock(LoopInterface::class);
 });
@@ -19,13 +19,15 @@ beforeEach(function () {
 it('creates config with required properties and defaults', function () {
     // Arrange & Act
     $config = new ClientConfig(
-        clientInfo: $this->clientInfo,
+        name: $this->name,
+        version: $this->version,
         capabilities: $this->capabilities,
         loop: $this->loop
     );
 
     // Assert
-    expect($config->clientInfo)->toBe($this->clientInfo);
+    expect($config->name)->toBe($this->name);
+    expect($config->version)->toBe($this->version);
     expect($config->capabilities)->toBe($this->capabilities);
     expect($config->loop)->toBe($this->loop);
     // Assert defaults
@@ -46,7 +48,8 @@ it('creates config with all optional properties set', function () {
 
     // Act
     $config = new ClientConfig(
-        clientInfo: $this->clientInfo,
+        name: $this->name,
+        version: $this->version,
         capabilities: $this->capabilities,
         logger: $logger,
         cache: $cache,
@@ -68,7 +71,8 @@ it('creates config with all optional properties set', function () {
 it('uses default loop if not provided', function () {
     // Arrange & Act - don't pass loop to constructor
     $config = new ClientConfig(
-        clientInfo: $this->clientInfo,
+        name: $this->name,
+        version: $this->version,
         capabilities: $this->capabilities
     );
 

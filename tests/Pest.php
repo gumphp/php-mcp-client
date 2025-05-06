@@ -11,7 +11,6 @@ use PhpMcp\Client\JsonRpc\Notification;
 use PhpMcp\Client\JsonRpc\Request;
 use PhpMcp\Client\JsonRpc\Response;
 use PhpMcp\Client\Model\Capabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\ServerConnection;
 use Psr\Log\NullLogger;
@@ -40,14 +39,16 @@ function createClientForTesting(
         ->with(Mockery::on(fn ($arg) => $arg === $serverConfig))
         ->andReturn($mockTransport);
 
-    $clientInfo = $options['clientInfo'] ?? new ClientInfo('FeatureTestClient', '1.0');
+    $clientName = $options['clientName'] ?? 'FeatureTestClient';
+    $clientVersion = $options['clientVersion'] ?? '1.0';
     $clientCaps = $options['capabilities'] ?? Capabilities::forClient();
     $logger = $options['logger'] ?? new NullLogger;
     $cache = $options['cache'] ?? null;
     $dispatcher = $options['dispatcher'] ?? null;
 
     $clientConfig = new ClientConfig(
-        clientInfo: $clientInfo,
+        name: $clientName,
+        version: $clientVersion,
         capabilities: $clientCaps,
         logger: $logger,
         cache: $cache,

@@ -25,7 +25,6 @@ use PhpMcp\Client\JsonRpc\Results\CallToolResult as ResultsCallToolResult;
 use PhpMcp\Client\JsonRpc\Results\GetPromptResult;
 use PhpMcp\Client\JsonRpc\Results\ReadResourceResult;
 use PhpMcp\Client\Model\Capabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Content\EmbeddedResource;
 use PhpMcp\Client\Model\Content\PromptMessage;
 use PhpMcp\Client\Model\Content\TextContent;
@@ -61,7 +60,8 @@ beforeEach(function () {
     );
 
     $this->clientConfig = new ClientConfig(
-        clientInfo: new ClientInfo('AsyncTestClient', '1.0'),
+        name: 'AsyncTestClient',
+        version: '1.0',
         capabilities: Capabilities::forClient(),
         logger: $this->logger,
         eventDispatcher: $this->dispatcher,
@@ -158,7 +158,8 @@ it('can initialize connection asynchronously', function () {
     expect($resolvedClient)->toBe($this->client);
     expect($result)->toBe($this->client);
     expect($this->client->getStatus())->toBe(ConnectionStatus::Ready);
-    expect($this->client->getServerInfo()?->name)->toBe('AsyncMockServer');
+    expect($this->client->getServerName())->toBe('AsyncMockServer');
+    expect($this->client->getServerVersion())->toBe('2.0');
 
 })->group('usesLoop');
 

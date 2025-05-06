@@ -5,7 +5,6 @@ use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Exception\ConfigurationException;
 use PhpMcp\Client\Factory\TransportFactory;
 use PhpMcp\Client\Model\Capabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\Transport\Http\HttpClientTransport;
 use PhpMcp\Client\Transport\Stdio\StdioClientTransport;
@@ -13,9 +12,10 @@ use React\EventLoop\LoopInterface;
 
 beforeEach(function () {
     $this->loop = Mockery::mock(LoopInterface::class);
-    $this->clientInfo = new ClientInfo('Test', '1.0');
+    $this->name = 'TestClient';
+    $this->version = '1.0';
     $this->clientCaps = Capabilities::forClient();
-    $this->clientConfig = new ClientConfig($this->clientInfo, $this->clientCaps, loop: $this->loop);
+    $this->clientConfig = new ClientConfig($this->name, $this->version, $this->clientCaps, loop: $this->loop);
     $this->factory = new TransportFactory($this->clientConfig);
 });
 

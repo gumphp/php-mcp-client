@@ -6,7 +6,6 @@ use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Exception\ConfigurationException;
 use PhpMcp\Client\Factory\MessageIdGenerator;
 use PhpMcp\Client\Model\Capabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\ServerConfig;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -15,11 +14,11 @@ use React\EventLoop\LoopInterface;
 
 it('builds client with minimal configuration', function () {
     // Arrange
-    $info = new ClientInfo('MinClient', '0.1');
 
     // Act
     $client = Client::make()
-        ->withClientInfo($info)
+        ->withName('MinClient')
+        ->withVersion('0.1')
         ->withServerConfig(new ServerConfig(name: 's1', transport: TransportType::Stdio, command: 'c'))
         ->build();
 
@@ -32,7 +31,8 @@ it('builds client with minimal configuration', function () {
     $internalConfig = $configProp->getValue($client);
 
     expect($internalConfig)->toBeInstanceOf(ClientConfig::class);
-    expect($internalConfig->clientInfo)->toBe($info);
+    expect($internalConfig->name)->toBe('MinClient');
+    expect($internalConfig->version)->toBe('0.1');
     expect($internalConfig->capabilities)->toBeInstanceOf(Capabilities::class);
     expect($internalConfig->logger)->toBeInstanceOf(\Psr\Log\NullLogger::class);
     expect($internalConfig->cache)->toBeNull();
@@ -42,7 +42,6 @@ it('builds client with minimal configuration', function () {
 
 it('builds client with all configurations', function () {
     // Arrange
-    $info = new ClientInfo('FullClient', '1.1');
     $caps = Capabilities::forClient(supportsSampling: false, supportsRootListChanged: true);
     $logger = Mockery::mock(LoggerInterface::class);
     $cache = Mockery::mock(CacheInterface::class);
@@ -54,7 +53,8 @@ it('builds client with all configurations', function () {
 
     // Act
     $client = Client::make()
-        ->withClientInfo($info)
+        ->withName('FullClient')
+        ->withVersion('1.1')
         ->withCapabilities($caps)
         ->withLogger($logger)
         ->withCache($cache, 900)
@@ -71,7 +71,8 @@ it('builds client with all configurations', function () {
     $configProp->setAccessible(true);
     $internalConfig = $configProp->getValue($client);
 
-    expect($internalConfig->clientInfo)->toBe($info);
+    expect($internalConfig->name)->toBe('FullClient');
+    expect($internalConfig->version)->toBe('1.1');
     expect($internalConfig->capabilities)->toBe($caps);
     expect($internalConfig->logger)->toBe($logger);
     expect($internalConfig->cache)->toBe($cache);
@@ -80,6 +81,10 @@ it('builds client with all configurations', function () {
     expect($internalConfig->loop)->toBe($loop);
 });
 
-it('throws exception if client info not provided', function () {
+it('throws exception if client name not provided', function () {
     Client::make()->build();
-})->throws(ConfigurationException::class, 'ClientInfo must be provided');
+})->throws(ConfigurationException::class, 'Name must be provided using withName().');
+
+it('throws exception if client version not provided', function () {
+    Client::make()->withName('TestClient')->build();
+})->throws(ConfigurationException::class, 'Version must be provided using withVersion().');

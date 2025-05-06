@@ -12,17 +12,14 @@ use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Exception\McpClientException;
 use PhpMcp\Client\Exception\RequestException;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Content\EmbeddedResource;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\StreamLogger;
 
 // --- Configuration ---
 
-$clientInfo = new ClientInfo(
-    name: 'MySimplePHPHttpClient',
-    version: '0.1.1'
-);
+$clientName = 'MySimplePHPHttpClient';
+$clientVersion = '0.1.1';
 $clientCapabilities = ClientCapabilities::forClient(supportsSampling: false);
 $logger = new StreamLogger(__DIR__.'/client_http.log');
 
@@ -34,7 +31,8 @@ $httpServerConfig = new ServerConfig(
 );
 
 $httpClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName($clientName)
+    ->withVersion($clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withServerConfig($httpServerConfig)
@@ -47,7 +45,7 @@ try {
     $httpClient->initialize();
 
     echo "Connection to {$httpServerConfig->name} initialized successfully!\n";
-    echo "Server: {$httpClient->getServerInfo()?->name} v{$httpClient->getServerInfo()?->version}, Protocol: {$httpClient->getNegotiatedProtocolVersion()}\n";
+    echo "Server: {$httpClient->getServerName()} v{$httpClient->getServerVersion()}, Protocol: {$httpClient->getNegotiatedProtocolVersion()}\n";
 
     // 1. List Tools
     echo "\n[1] Listing Tools...\n";

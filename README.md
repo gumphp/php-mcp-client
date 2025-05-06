@@ -5,13 +5,13 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/php-mcp/client/tests.yml?branch=main&style=flat-square)](https://github.com/php-mcp/client/actions/workflows/tests.yml)
 [![License](https://img.shields.io/packagist/l/php-mcp/client.svg?style=flat-square)](LICENSE)
 
-**`php-mcp/client` is a PHP library for interacting with servers that implement the Model Context Protocol (MCP).**
+** PHP MCP Client is a PHP library for interacting with servers that implement the Model Context Protocol (MCP).**
 
 It provides a developer-friendly interface to connect to individual MCP servers using different transports (`stdio`, `http+sse`), manage the connection lifecycle, discover server capabilities (Tools, Resources, Prompts), and execute requests like calling tools or reading resources.
 
 While utilizing asynchronous I/O internally via ReactPHP for robustness and handling features like server-sent events, the library offers **both** a straightforward **synchronous (blocking) API** for common use cases and an **asynchronous (Promise-based) API** for advanced control and concurrency.
 
-This library aligns with the MCP specification's model where one client instance manages a stateful connection to one server, and acts as the counterpart to the [`php-mcp/server`](https://github.com/php-mcp/server) package.
+This library aligns with the MCP specification's model where one client instance manages a stateful connection to one server.
 
 ## Introduction to MCP
 
@@ -30,7 +30,6 @@ This client library allows your PHP application (acting as the "Host" in MCP ter
     *   `stdio`: Communicating with server processes via Standard Input/Output.
     *   `http`: Communicating with servers via HTTP POST and Server-Sent Events (SSE).
 *   **Explicit Connection Lifecycle:** Requires `->initialize()` or `->initializeAsync()` to connect and perform the handshake before making requests. Provides `disconnect()` / `disconnectAsync()`.
-*   **Capability Discovery:** Automatically performs the MCP handshake via `initialize()` to determine server capabilities.
 *   **Tool/Resource/Prompt Interaction:** Provides comprehensive methods (sync & async) to list available elements and execute requests like `tools/call`, `resources/read`, `prompts/get`.
 *   **PSR Compliance:** Integrates with standard PHP interfaces:
     *   `PSR-3` (LoggerInterface): Integrate your application's logger.
@@ -43,7 +42,6 @@ This client library allows your PHP application (acting as the "Host" in MCP ter
 
 *   PHP >= 8.1
 *   Composer
-*   `react/event-loop` (and other ReactPHP components installed as dependencies)
 *   *(For Stdio Transport)*: Ability to execute the server command.
 *   *(For Http Transport)*: Network access to the MCP server URL.
 
@@ -68,64 +66,42 @@ require 'vendor/autoload.php';
 
 use PhpMcp\Client\Client;
 use PhpMcp\Client\Enum\TransportType;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\Exception\McpClientException;
 
-// 1. Client Info & Capabilities
-$clientInfo = new ClientInfo('MyFileSystemApp', '1.0');
 $clientCapabilities = ClientCapabilities::forClient(); // Default client caps
 
-// 2. Server Configuration (Filesystem Server Example)
-$userHome = $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'] ?? getcwd(); // Get user's home reliably
+$userHome = $_SERVER['HOME'] ?? $_SERVER['USERPROFILE'] ?? getcwd();
 $fsServerConfig = new ServerConfig(
-    name: 'local_filesystem', // A name for this config
+    name: 'local_filesystem',
     transport: TransportType::Stdio,
     timeout: 15,
-    command: 'npx', // The command executable
-    args: [        // Arguments array
-        '-y',      // Argument for npx
-        '@modelcontextprotocol/server-filesystem', // The server package
-        $userHome . '/Documents', // Example directory server can access
-        // Add more allowed paths if needed
+    command: 'npx',
+    args: [
+        '-y',
+        '@modelcontextprotocol/server-filesystem',
+        $userHome . '/Documents',
     ],
-    workingDir: $userHome // Where to run npx from
+    workingDir: $userHome
 );
 
-// 3. Build the Client instance for this specific server
 $fsClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName('MyFileSystemApp')
+    ->withVersion('1.0')
     ->withCapabilities($clientCapabilities)
     // ->withLogger(new MyPsrLogger()) // Optional
     ->withServerConfig($fsServerConfig)
     ->build();
 
 try {
-    // 4. Initialize Connection (BLOCKING)
-    echo "Initializing connection to '{$fsServerConfig->name}'...\n";
+    // Initialize Connection (BLOCKING)
     $fsClient->initialize();
-    echo "Connection Ready! Server: {$fsClient->getServerInfo()?->name}\n";
 
-    // 5. Interact (Synchronously)
-    echo "Listing tools...\n";
+    // Interact (Synchronously)
     $tools = $fsClient->listTools(); // Blocking call
     foreach ($tools as $tool) {
         echo "- Tool: {$tool->name}\n";
-    }
-
-    echo "\nReading a resource (e.g., a file in allowed dir)...\n";
-    $readmePath = $userHome . '/Documents/README.md'; // Example file path
-    if (file_exists($readmePath)) {
-         $resourceUri = 'file://' . realpath($readmePath);
-         echo "Reading: {$resourceUri}\n";
-         $readResult = $fsClient->readResource($resourceUri); // Blocking call
-         $content = $readResult->contents[0] ?? null;
-         if ($content) {
-             echo "Content (first 100 chars): " . substr($content->text ?? '', 0, 100) . "...\n";
-         }
-    } else {
-         echo "Skipping readResource: {$readmePath} not found.\n";
     }
 
     // ... Call other methods like $fsClient->callTool(...) ...
@@ -136,11 +112,9 @@ try {
 } catch (\Throwable $e) {
     echo "[UNEXPECTED ERROR] " . $e->getMessage() . "\n";
 } finally {
-    // 6. Disconnect (BLOCKING)
+    // Disconnect (BLOCKING)
     if (isset($fsClient)) {
-        echo "Disconnecting from '{$fsServerConfig->name}'...\n";
         $fsClient->disconnect();
-        echo "Disconnected.\n";
     }
 }
 ```
@@ -149,24 +123,10 @@ try {
 
 Configuration involves setting up:
 
-1.  **Client Identity:** Your application's details using `ClientInfo`.
+1.  **Client Identity:** Your application's name and version, passed directly to the builder.
 2.  **Client Capabilities:** Features your client supports using `ClientCapabilities`.
 3.  **Server Connection:** Details for the *single server* this client instance will connect to, using `ServerConfig`.
 4.  **(Optional) Dependencies:** Logger, Cache, Event Dispatcher, Event Loop.
-
-### `ClientInfo`
-
-A simple value object for identifying your client application to the server.
-
-```php
-use PhpMcp\Client\Model\ClientInfo;
-
-$clientInfo = new ClientInfo(
-    name: 'MyAwesomePHPApp',
-    version: '2.5.0'
-    // Optional: supportedLocales: ['en-US', 'en-GB']
-);
-```
 
 ### `ClientCapabilities`
 
@@ -267,14 +227,15 @@ use PhpMcp\Client\Client;
 // ... other use statements for Config, Logger etc...
 
 $client = Client::make()
-    ->withClientInfo($clientInfo)            // Required
-    ->withCapabilities($clientCapabilities)  // Optional (defaults provided)
-    ->withServerConfig($stdioConfig)       // Required: Config for THE server
-    ->withLogger($myLogger)                // Optional
-    ->withCache($myCache, 3600)            // Optional (cache + TTL)
-    ->withEventDispatcher($myDispatcher)   // Optional
-    ->withIdGenerator($myIdGenerator)      // Optional
-    ->withLoop($myEventLoop)             // Optional (defaults to Loop::get())
+    ->withName($clientName)                 // Required
+    ->withVersion($clientVersion)           // Required
+    ->withCapabilities($clientCapabilities) // Optional (defaults provided)
+    ->withServerConfig($stdioConfig)        // Required: Config for THE server
+    ->withLogger($myLogger)                 // Optional
+    ->withCache($myCache, 3600)             // Optional (cache + TTL)
+    ->withEventDispatcher($myDispatcher)    // Optional
+    ->withIdGenerator($myIdGenerator)       // Optional
+    ->withLoop($myEventLoop)                // Optional (defaults to Loop::get())
     ->build();
 ```
 
@@ -377,8 +338,10 @@ The `Client` class provides methods for interacting with the connected MCP serve
     Returns the current connection status enum (`Disconnected`, `Connecting`, `Handshaking`, `Ready`, `Closing`, `Closed`, `Error`).
 *   `isReady(): bool`
     Helper method, returns `true` if status is `Ready`.
-*   `getServerInfo(): ?ServerInfo`
-    Returns information about the connected server (available after successful initialization).
+*   `getServerName(): ?string`
+    Returns the name of the server (available after successful initialization).
+*   `getServerVersion(): ?string`
+    Returns the version of the server (available after successful initialization).
 *   `getNegotiatedCapabilities(): ?Capabilities`
     Returns the capabilities negotiated with the server (available after successful initialization).
 *   `getNegotiatedProtocolVersion(): ?string`

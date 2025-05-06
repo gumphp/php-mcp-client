@@ -101,7 +101,7 @@ it('dispatches events when notifications are received', function () {
 
     $this->mockDispatcher->shouldReceive('dispatch')
         ->with(Mockery::on(function (ResourceChanged $event) {
-            return $event->serverName === TEST_SERVER_NAME_NOTIFY
+            return $event->serverName === 'MockServer'
                    && $event->uri === 'file:///updated.txt';
         }))
         ->once()
@@ -138,7 +138,3 @@ it('dispatches events when notifications are received', function () {
     expect(true)->toBeTrue();
 
 })->group('usesLoop');
-
-afterEach(function () {
-    gc_collect_cycles();
-});

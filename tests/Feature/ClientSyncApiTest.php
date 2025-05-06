@@ -79,7 +79,7 @@ it('initializes successfully', function () {
     // Assert
     expect($returnedClient)->toBe($this->client);
     expect($this->client->getStatus())->toBe(ConnectionStatus::Ready);
-    expect($this->client->getServerInfo()?->name)->toBe('MockServer');
+    expect($this->client->getServerName())->toBe('MockServer');
 
 })->group('usesLoop');
 

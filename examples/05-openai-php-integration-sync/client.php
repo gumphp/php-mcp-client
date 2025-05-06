@@ -12,7 +12,6 @@ use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Exception\McpClientException;
 use PhpMcp\Client\Exception\RequestException;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Content\TextContent;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\StreamLogger;
@@ -29,7 +28,8 @@ if (! $openaiApiKey) {
 
 $logger = new StreamLogger(__DIR__.'/openai_client.log');
 
-$clientInfo = new ClientInfo('OpenAI-MCP-Demo', '1.0');
+$clientName = 'OpenAI-MCP-Demo';
+$clientVersion = '1.0';
 $clientCapabilities = ClientCapabilities::forClient();
 
 $pathToStdioServerScript = __DIR__.'/../../../server/samples/php_stdio/server.php';
@@ -39,7 +39,8 @@ $stdioServerConfig = new ServerConfig(
     name: 'local_stdio',
     transport: TransportType::Stdio,
     timeout: 15,
-    command: ['php', $pathToStdioServerScript]
+    command: 'php',
+    args: [$pathToStdioServerScript]
 );
 
 $httpServerConfig = new ServerConfig(
@@ -53,8 +54,8 @@ $firecrawlMcpServerConfig = new ServerConfig(
     name: 'firecrawl',
     transport: TransportType::Stdio,
     timeout: 45,
-    command: [
-        'env',
+    command: 'env',
+    args: [
         'FIRECRAWL_API_KEY=fc-f6bc6f23c9554cecb64a3feecc802d26',
         'npx',
         '-y',
@@ -75,7 +76,8 @@ echo "Building MCP clients...\n";
 foreach ($serversToConfigure as $serverName => $serverConfig) {
     try {
         $mcpClients[$serverName] = Client::make()
-            ->withClientInfo($clientInfo)
+            ->withName($clientName)
+            ->withVersion($clientVersion)
             ->withCapabilities($clientCapabilities)
             ->withLogger($logger)
             ->withServerConfig($serverConfig)

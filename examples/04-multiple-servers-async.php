@@ -12,7 +12,6 @@ use PhpMcp\Client\Client;
 use PhpMcp\Client\Enum\ConnectionStatus;
 use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Content\EmbeddedResource;
 use PhpMcp\Client\Model\Content\TextContent;
 use PhpMcp\Client\ServerConfig;
@@ -21,10 +20,8 @@ use React\EventLoop\Loop;
 
 use function React\Promise\all;
 
-$clientInfo = new ClientInfo(
-    name: 'MultiServerAsyncClient',
-    version: '0.3.0'
-);
+$clientName = 'MultiServerAsyncClient';
+$clientVersion = '0.3.0';
 $clientCapabilities = ClientCapabilities::forClient(supportsSampling: false);
 $logger = new StreamLogger(__DIR__.'/client_multi_async.log');
 $loop = Loop::get();
@@ -47,7 +44,8 @@ $httpServerConfig = new ServerConfig(
 
 // --- Build Clients ---
 $stdioClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName($clientName)
+    ->withVersion($clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withLoop($loop)
@@ -55,7 +53,8 @@ $stdioClient = Client::make()
     ->build();
 
 $httpClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName($clientName)
+    ->withVersion($clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withLoop($loop)

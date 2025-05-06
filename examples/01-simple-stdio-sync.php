@@ -12,17 +12,14 @@ use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Exception\McpClientException;
 use PhpMcp\Client\Exception\RequestException;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Content\EmbeddedResource;
 use PhpMcp\Client\Model\Content\TextContent;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\StreamLogger;
 
 // --- Configuration ---
-$clientInfo = new ClientInfo(
-    name: 'MySimplePHPClient',
-    version: '0.1.0'
-);
+$clientName = 'MySimplePHPClient';
+$clientVersion = '0.1.0';
 $clientCapabilities = ClientCapabilities::forClient(supportsSampling: false);
 $logger = new StreamLogger(__DIR__.'/client_stdio.log');
 
@@ -37,7 +34,8 @@ $stdioServerConfig = new ServerConfig(
 );
 
 $stdioClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName($clientName)
+    ->withVersion($clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withServerConfig($stdioServerConfig)
@@ -49,7 +47,7 @@ try {
     $stdioClient->initialize();
 
     echo "Connection to {$stdioServerConfig->name} initialized successfully!\n";
-    echo "Server: {$stdioClient->getServerInfo()?->name} v{$stdioClient->getServerInfo()?->version}, Protocol: {$stdioClient->getNegotiatedProtocolVersion()}\n";
+    echo "Server: {$stdioClient->getServerName()} v{$stdioClient->getServerVersion()}, Protocol: {$stdioClient->getNegotiatedProtocolVersion()}\n";
 
     // 1. List Tools
     echo "\n[1] Listing Tools...\n";

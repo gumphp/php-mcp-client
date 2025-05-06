@@ -11,17 +11,14 @@ use PhpMcp\Client\Client;
 use PhpMcp\Client\Enum\TransportType;
 use PhpMcp\Client\Exception\McpClientException;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use PhpMcp\Client\Model\Content\TextContent;
 use PhpMcp\Client\ServerConfig;
 use PhpMcp\Client\StreamLogger;
 
 // --- Configuration ---
 
-$clientInfo = new ClientInfo(
-    name: 'MultiServerClientDemo',
-    version: '0.2.0'
-);
+$clientName = 'MultiServerClientDemo';
+$clientVersion = '0.2.0';
 $clientCapabilities = ClientCapabilities::forClient(supportsSampling: false);
 $logger = new StreamLogger(__DIR__.'/client_multi.log');
 
@@ -42,14 +39,16 @@ $httpServerConfig = new ServerConfig(
 
 // --- Instantiate Clients ---
 $stdioClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName($clientName)
+    ->withVersion($clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withServerConfig($stdioServerConfig)
     ->build();
 
 $httpClient = Client::make()
-    ->withClientInfo($clientInfo)
+    ->withName($clientName)
+    ->withVersion($clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withServerConfig($httpServerConfig)

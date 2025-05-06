@@ -8,7 +8,6 @@ use PhpMcp\Client\Exception\ConfigurationException;
 use PhpMcp\Client\Factory\MessageIdGenerator;
 use PhpMcp\Client\Factory\TransportFactory; // Added use
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -22,7 +21,9 @@ use React\EventLoop\LoopInterface;
  */
 class ClientBuilder
 {
-    protected ?ClientInfo $clientInfo = null;
+    protected ?string $name = null;
+
+    protected ?string $version = null;
 
     protected ?ClientCapabilities $capabilities = null;
 
@@ -49,9 +50,16 @@ class ClientBuilder
         return new self;
     }
 
-    public function withClientInfo(ClientInfo $clientInfo): self
+    public function withName(string $name): self
     {
-        $this->clientInfo = $clientInfo;
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function withVersion(string $version): self
+    {
+        $this->version = $version;
 
         return $this;
     }
@@ -130,8 +138,12 @@ class ClientBuilder
      */
     public function build(): Client
     {
-        if ($this->clientInfo === null) {
-            throw new ConfigurationException('ClientInfo must be provided using withClientInfo().');
+        if ($this->name === null) {
+            throw new ConfigurationException('Name must be provided using withName().');
+        }
+
+        if ($this->version === null) {
+            throw new ConfigurationException('Version must be provided using withVersion().');
         }
 
         if ($this->serverConfig === null) {
@@ -142,7 +154,8 @@ class ClientBuilder
         $loop = $this->loop ?? Loop::get();
 
         $clientConfig = new ClientConfig(
-            clientInfo: $this->clientInfo,
+            name: $this->name,
+            version: $this->version,
             capabilities: $capabilities,
             logger: $this->logger,
             cache: $this->cache,

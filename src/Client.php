@@ -33,7 +33,6 @@ use PhpMcp\Client\JsonRpc\Results\ReadResourceResult;
 use PhpMcp\Client\Model\Capabilities;
 use PhpMcp\Client\Model\Definitions\ResourceDefinition;
 use PhpMcp\Client\Model\Definitions\ToolDefinition;
-use PhpMcp\Client\Model\ServerInfo;
 use PhpMcp\Client\Transport\Stdio\StdioClientTransport;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -74,7 +73,9 @@ class Client
     /** @var array<string|int, Deferred> Request ID => Deferred mapping */
     protected array $pendingRequests = [];
 
-    protected ?ServerInfo $serverInfo = null;
+    protected ?string $serverName = null;
+
+    protected ?string $serverVersion = null;
 
     protected ?Capabilities $serverCapabilities = null;
 
@@ -107,19 +108,19 @@ class Client
 
     // --- Getters for Connection State ---
 
-    public function getServerName(): string
-    {
-        return $this->serverConfig->name;
-    }
-
     public function getStatus(): ConnectionStatus
     {
         return $this->status;
     }
 
-    public function getServerInfo(): ?ServerInfo
+    public function getServerName(): ?string
     {
-        return $this->serverInfo;
+        return $this->serverName;
+    }
+
+    public function getServerVersion(): ?string
+    {
+        return $this->serverVersion;
     }
 
     public function getNegotiatedCapabilities(): ?Capabilities
@@ -220,8 +221,8 @@ class Client
                 $this->status = ConnectionStatus::Ready;
                 $this->logger->info("Server '{$this->getServerName()}' connection ready.", [
                     'protocol' => $this->negotiatedProtocolVersion,
-                    'server' => $this->serverInfo?->name,
-                    'version' => $this->serverInfo?->version,
+                    'server' => $this->serverName,
+                    'version' => $this->serverVersion,
                 ]);
 
                 return $this;
@@ -882,9 +883,10 @@ class Client
     private function performHandshake(): PromiseInterface
     {
         $initParams = new InitializeParams(
+            clientName: $this->clientConfig->name,
+            clientVersion: $this->clientConfig->version,
             protocolVersion: $this->preferredProtocolVersion,
             capabilities: $this->clientConfig->capabilities,
-            clientInfo: $this->clientConfig->clientInfo
         );
 
         $request = new Request(
@@ -915,7 +917,8 @@ class Client
                     }
                 }
                 $this->negotiatedProtocolVersion = $serverVersion;
-                $this->serverInfo = $initResult->serverInfo;
+                $this->serverName = $initResult->serverName;
+                $this->serverVersion = $initResult->serverVersion;
                 $this->serverCapabilities = $initResult->capabilities;
 
                 $this->logger->debug("Sending 'initialized' notification to '{$this->getServerName()}'.");
@@ -1231,7 +1234,8 @@ class Client
             $this->transport = null;
         }
         $this->pendingRequests = [];
-        $this->serverInfo = null;
+        $this->serverName = null;
+        $this->serverVersion = null;
         $this->serverCapabilities = null;
         $this->negotiatedProtocolVersion = null;
         $this->connectPromise = null;

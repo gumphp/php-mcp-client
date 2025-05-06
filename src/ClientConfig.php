@@ -6,7 +6,6 @@ namespace PhpMcp\Client;
 
 use PhpMcp\Client\Factory\MessageIdGenerator;
 use PhpMcp\Client\Model\Capabilities as ClientCapabilities;
-use PhpMcp\Client\Model\ClientInfo;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -30,7 +29,8 @@ class ClientConfig
     public readonly MessageIdGenerator $idGenerator;
 
     /**
-     * @param  ClientInfo  $clientInfo  Information about this client application.
+     * @param  string  $name  The name of this client application.
+     * @param  string  $version  The version of this client application.
      * @param  ClientCapabilities  $capabilities  Capabilities declared by this client.
      * @param  LoggerInterface|null  $logger  Optional PSR-3 logger. Defaults to NullLogger.
      * @param  CacheInterface|null  $cache  Optional PSR-16 cache for definition caching.
@@ -39,7 +39,8 @@ class ClientConfig
      * @param  int  $definitionCacheTtl  TTL for cached definitions (tools, resources etc.) in seconds.
      */
     public function __construct(
-        public readonly ClientInfo $clientInfo,
+        public readonly string $name,
+        public readonly string $version,
         public readonly ClientCapabilities $capabilities,
         ?LoggerInterface $logger = null,
         ?CacheInterface $cache = null,
