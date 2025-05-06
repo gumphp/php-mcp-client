@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpMcp\Client\JsonRpc\Parameter;
+namespace PhpMcp\Client\JsonRpc\Params;
 
-final readonly class SubscribeResourceParams
+class SubscribeResourceParams
 {
-    public function __construct(public string $uri) {}
+    public function __construct(public readonly string $uri) {}
 
     public function toArray(): array
     {

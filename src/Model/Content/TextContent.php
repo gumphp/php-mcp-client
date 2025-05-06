@@ -7,9 +7,9 @@ namespace PhpMcp\Client\Model\Content;
 use PhpMcp\Client\Contracts\ContentInterface;
 use PhpMcp\Client\Exception\ProtocolException;
 
-final readonly class TextContent implements ContentInterface
+class TextContent implements ContentInterface
 {
-    public function __construct(public string $text) {}
+    public function __construct(public readonly string $text) {}
 
     public function getType(): string
     {

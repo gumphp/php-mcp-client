@@ -6,13 +6,13 @@ namespace PhpMcp\Client\Model\Content;
 
 use PhpMcp\Client\Exception\ProtocolException;
 
-final readonly class EmbeddedResource
+class EmbeddedResource
 {
     public function __construct(
-        public string $uri,
-        public string $mimeType,
-        public ?string $text = null,
-        public ?string $blob = null // Base64 encoded
+        public readonly string $uri,
+        public readonly string $mimeType,
+        public readonly ?string $text = null,
+        public readonly ?string $blob = null // Base64 encoded
     ) {
         if ($this->text === null && $this->blob === null) {
             throw new \InvalidArgumentException("EmbeddedResource must have either 'text' or 'blob'.");

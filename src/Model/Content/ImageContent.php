@@ -7,11 +7,11 @@ namespace PhpMcp\Client\Model\Content;
 use PhpMcp\Client\Contracts\ContentInterface;
 use PhpMcp\Client\Exception\ProtocolException;
 
-final readonly class ImageContent implements ContentInterface
+class ImageContent implements ContentInterface
 {
     public function __construct(
-        public string $data,
-        public string $mimeType
+        public readonly string $data,
+        public readonly string $mimeType
     ) {}
 
     public function getType(): string

@@ -6,17 +6,16 @@ namespace PhpMcp\Client\JsonRpc;
 
 use Psy\Readline\Hoa\ProtocolException;
 
-final readonly class Error
+class Error
 {
     /**
      * @param  mixed|null  $data  Optional additional data
      */
     public function __construct(
-        public int $code,
-        public string $message,
-        public mixed $data = null,
-    ) {
-    }
+        public readonly int $code,
+        public readonly string $message,
+        public readonly mixed $data = null,
+    ) {}
 
     /**
      * @throws ProtocolException

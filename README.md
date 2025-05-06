@@ -5,7 +5,7 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/php-mcp/client/tests.yml?branch=main&style=flat-square)](https://github.com/php-mcp/client/actions/workflows/tests.yml)
 [![License](https://img.shields.io/packagist/l/php-mcp/client.svg?style=flat-square)](LICENSE)
 
-** PHP MCP Client is a PHP library for interacting with servers that implement the Model Context Protocol (MCP).**
+**PHP MCP Client is a PHP library for interacting with servers that implement the Model Context Protocol (MCP).**
 
 It provides a developer-friendly interface to connect to individual MCP servers using different transports (`stdio`, `http+sse`), manage the connection lifecycle, discover server capabilities (Tools, Resources, Prompts), and execute requests like calling tools or reading resources.
 

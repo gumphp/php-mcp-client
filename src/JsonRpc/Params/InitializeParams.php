@@ -6,13 +6,13 @@ namespace PhpMcp\Client\JsonRpc\Params;
 
 use PhpMcp\Client\Model\Capabilities;
 
-final readonly class InitializeParams
+class InitializeParams
 {
     public function __construct(
-        public string $clientName,
-        public string $clientVersion,
-        public string $protocolVersion,
-        public Capabilities $capabilities,
+        public readonly string $clientName,
+        public readonly string $clientVersion,
+        public readonly string $protocolVersion,
+        public readonly Capabilities $capabilities,
 
         // Add optional processId, rootUri, trace etc. if client supports them
     ) {}

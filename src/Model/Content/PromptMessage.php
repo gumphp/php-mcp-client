@@ -7,11 +7,11 @@ namespace PhpMcp\Client\Model\Content;
 use PhpMcp\Client\Contracts\ContentInterface;
 use PhpMcp\Client\Exception\ProtocolException;
 
-final readonly class PromptMessage
+class PromptMessage
 {
     public function __construct(
-        public string $role,
-        public ContentInterface $content
+        public readonly string $role,
+        public readonly ContentInterface $content
     ) {
         if ($role !== 'user' && $role !== 'assistant') {
             throw new \InvalidArgumentException("Invalid role '{$role}', must be 'user' or 'assistant'.");

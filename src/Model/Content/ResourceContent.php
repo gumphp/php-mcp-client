@@ -7,10 +7,10 @@ namespace PhpMcp\Client\Model\Content;
 use PhpMcp\Client\Contracts\ContentInterface;
 use PhpMcp\Client\Exception\ProtocolException;
 
-final readonly class ResourceContent implements ContentInterface
+class ResourceContent implements ContentInterface
 {
     public function __construct(
-        public EmbeddedResource $resource
+        public readonly EmbeddedResource $resource
     ) {}
 
     public function getType(): string
