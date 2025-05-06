@@ -76,8 +76,7 @@ echo "Building MCP clients...\n";
 foreach ($serversToConfigure as $serverName => $serverConfig) {
     try {
         $mcpClients[$serverName] = Client::make()
-            ->withName($clientName)
-            ->withVersion($clientVersion)
+            ->withClientInfo($clientName, $clientVersion)
             ->withCapabilities($clientCapabilities)
             ->withLogger($logger)
             ->withServerConfig($serverConfig)

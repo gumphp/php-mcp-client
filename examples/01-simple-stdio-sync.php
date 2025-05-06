@@ -34,8 +34,7 @@ $stdioServerConfig = new ServerConfig(
 );
 
 $stdioClient = Client::make()
-    ->withName($clientName)
-    ->withVersion($clientVersion)
+    ->withClientInfo($clientName, $clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withServerConfig($stdioServerConfig)

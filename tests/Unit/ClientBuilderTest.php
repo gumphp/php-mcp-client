@@ -48,8 +48,7 @@ it('builds client with all configurations', function () {
     $dispatcher = Mockery::mock(EventDispatcherInterface::class);
     $loop = Mockery::mock(LoopInterface::class);
     $idGen = new MessageIdGenerator('test-');
-    $server1 = new ServerConfig(name: 's1', transport: TransportType::Stdio, command: 'c');
-    $server2 = new ServerConfig(name: 's2', transport: TransportType::Http, url: 'http://s');
+    $server = new ServerConfig(name: 's1', transport: TransportType::Stdio, command: 'c');
 
     // Act
     $client = Client::make()
@@ -61,7 +60,7 @@ it('builds client with all configurations', function () {
         ->withEventDispatcher($dispatcher)
         ->withLoop($loop)
         ->withIdGenerator($idGen)
-        ->withServerConfig($server1)
+        ->withServerConfig($server)
         ->build();
 
     // Assert
@@ -79,6 +78,26 @@ it('builds client with all configurations', function () {
     expect($internalConfig->definitionCacheTtl)->toBe(900);
     expect($internalConfig->eventDispatcher)->toBe($dispatcher);
     expect($internalConfig->loop)->toBe($loop);
+});
+
+it('builds client with client info', function () {
+    $server = new ServerConfig(name: 's1', transport: TransportType::Stdio, command: 'c');
+
+    // Arrange
+    $client = Client::make()
+        ->withClientInfo('TestClient', '1.0')
+        ->withServerConfig($server)
+        ->build();
+
+    // Assert
+    expect($client)->toBeInstanceOf(Client::class);
+    $reflector = new ReflectionClass($client);
+    $configProp = $reflector->getProperty('clientConfig');
+    $configProp->setAccessible(true);
+    $internalConfig = $configProp->getValue($client);
+
+    expect($internalConfig->name)->toBe('TestClient');
+    expect($internalConfig->version)->toBe('1.0');
 });
 
 it('throws exception if client name not provided', function () {

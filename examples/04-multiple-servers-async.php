@@ -44,8 +44,7 @@ $httpServerConfig = new ServerConfig(
 
 // --- Build Clients ---
 $stdioClient = Client::make()
-    ->withName($clientName)
-    ->withVersion($clientVersion)
+    ->withClientInfo($clientName, $clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withLoop($loop)
@@ -53,8 +52,7 @@ $stdioClient = Client::make()
     ->build();
 
 $httpClient = Client::make()
-    ->withName($clientName)
-    ->withVersion($clientVersion)
+    ->withClientInfo($clientName, $clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withLoop($loop)

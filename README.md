@@ -87,8 +87,7 @@ $fsServerConfig = new ServerConfig(
 );
 
 $fsClient = Client::make()
-    ->withName('MyFileSystemApp')
-    ->withVersion('1.0')
+    ->withClientInfo('MyFileSystemApp', '1.0')
     ->withCapabilities($clientCapabilities)
     // ->withLogger(new MyPsrLogger()) // Optional
     ->withServerConfig($fsServerConfig)
@@ -227,15 +226,14 @@ use PhpMcp\Client\Client;
 // ... other use statements for Config, Logger etc...
 
 $client = Client::make()
-    ->withName($clientName)                 // Required
-    ->withVersion($clientVersion)           // Required
-    ->withCapabilities($clientCapabilities) // Optional (defaults provided)
-    ->withServerConfig($stdioConfig)        // Required: Config for THE server
-    ->withLogger($myLogger)                 // Optional
-    ->withCache($myCache, 3600)             // Optional (cache + TTL)
-    ->withEventDispatcher($myDispatcher)    // Optional
-    ->withIdGenerator($myIdGenerator)       // Optional
-    ->withLoop($myEventLoop)                // Optional (defaults to Loop::get())
+    ->withClientInfo($clientName, $clientVersion) // Required
+    ->withCapabilities($clientCapabilities)       // Optional (defaults provided)
+    ->withServerConfig($stdioConfig)              // Required: Config for THE server
+    ->withLogger($myLogger)                       // Optional
+    ->withCache($myCache, 3600)                   // Optional (cache + TTL)
+    ->withEventDispatcher($myDispatcher)          // Optional
+    ->withIdGenerator($myIdGenerator)             // Optional
+    ->withLoop($myEventLoop)                      // Optional (defaults to Loop::get())
     ->build();
 ```
 

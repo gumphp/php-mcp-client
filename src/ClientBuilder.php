@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhpMcp\Client;
 
+use Deprecated;
 use PhpMcp\Client\Exception\ConfigurationException;
 use PhpMcp\Client\Factory\MessageIdGenerator;
 use PhpMcp\Client\Factory\TransportFactory; // Added use
@@ -50,6 +51,7 @@ class ClientBuilder
         return new self;
     }
 
+    /** @deprecated 1.0.1 Use withClientInfo() instead. */
     public function withName(string $name): self
     {
         $this->name = $name;
@@ -57,8 +59,17 @@ class ClientBuilder
         return $this;
     }
 
+    /** @deprecated 1.0.1 Use withClientInfo() instead. */
     public function withVersion(string $version): self
     {
+        $this->version = $version;
+
+        return $this;
+    }
+
+    public function withClientInfo(string $name, string $version): self
+    {
+        $this->name = $name;
         $this->version = $version;
 
         return $this;

@@ -31,8 +31,7 @@ $httpServerConfig = new ServerConfig(
 );
 
 $httpClient = Client::make()
-    ->withName($clientName)
-    ->withVersion($clientVersion)
+    ->withClientInfo($clientName, $clientVersion)
     ->withCapabilities($clientCapabilities)
     ->withLogger($logger)
     ->withServerConfig($httpServerConfig)
