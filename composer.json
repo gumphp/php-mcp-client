@@ -1,5 +1,5 @@
 {
-    "name": "php-mcp/client",
+    "name": "gumphp/php-mcp-client",
     "description": "PHP Client for the Model Context Protocol (MCP)",
     "type": "library",
     "require": {
@@ -10,7 +10,7 @@
         "react/async": "^4.0",
         "react/child-process": "^0.6.6",
         "react/event-loop": "^1.5",
-        "react/http": "^1.11",
+        "gumphp/react-http": "^1.11",
         "react/promise": "^3.2",
         "react/stream": "^1.4"
     },
